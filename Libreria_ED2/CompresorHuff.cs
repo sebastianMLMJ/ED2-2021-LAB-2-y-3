@@ -101,7 +101,63 @@ namespace Libreria_ED2
 
                 }
             }
-           
+
+            public void Insertar(ref Nodo nuevoNodo)
+            {
+
+                if (Cabeza == null)
+                {
+                    Cabeza = nuevoNodo;
+                }
+                else
+                {
+
+                    //En el inicio de la cola
+                    if (nuevoNodo.frecuenciaRelativa < Cabeza.frecuenciaRelativa)
+                    {
+                        nuevoNodo.siguiente = Cabeza;
+                        Cabeza = nuevoNodo;
+                    }
+                    else
+                    {
+                        bool insertado = false;
+                        Nodo actual = Cabeza;
+                        Nodo siguiente = Cabeza.siguiente;
+                        while (insertado == false && siguiente != null)
+                        {
+                            if (nuevoNodo.frecuenciaRelativa < siguiente.frecuenciaRelativa)
+                            {
+                                actual.siguiente = nuevoNodo;
+                                nuevoNodo.siguiente = siguiente;
+                                insertado = true;
+                            }
+                            if (actual.frecuenciaRelativa == nuevoNodo.frecuenciaRelativa)
+                            {
+
+                                while (actual.frecuenciaRelativa == siguiente.frecuenciaRelativa)
+                                {
+                                    actual = actual.siguiente;
+                                    siguiente = siguiente.siguiente;
+                                }
+                                actual.siguiente = nuevoNodo;
+                                nuevoNodo.siguiente = siguiente;
+                                insertado = true;
+                            }
+
+                            actual = actual.siguiente;
+                            siguiente = siguiente.siguiente;
+                        }
+                        if (insertado == false && siguiente == null)
+                        {
+                            actual.siguiente = nuevoNodo;
+                        }
+                    }
+                    //En el medio de la cola
+
+
+                }
+            }
+
             //Pop
             public Nodo Sacar()
             {
@@ -124,6 +180,51 @@ namespace Libreria_ED2
                     Console.WriteLine(Mostrar.frecuenciaRelativa);
                     Mostrar = Mostrar.siguiente;
                 }
+            }
+        }
+
+        private class ArbolHuffman
+        {
+            public Nodo Raiz;
+
+            //Inserta en Arbol huffman izquierda mayores, derecha menores
+            public void Insertar(Nodo nodoMenor, Nodo nodoMayor, ref ColaPrioridad Cola)
+            {
+                if (nodoMayor != null && nodoMenor != null)
+                {
+                    Nodo nuevoN = new Nodo();
+                    nuevoN.frecuenciaRelativa = nodoMenor.frecuenciaRelativa + nodoMayor.frecuenciaRelativa;
+                    nuevoN.nodoD = nodoMenor;
+                    nuevoN.nodoI = nodoMayor;
+                    Cola.Insertar(ref nuevoN);
+                    Raiz = nuevoN;
+                }
+            }
+            //Genera los codigos prefijo en el Arbol y al mismo tiempo en el diccionario
+            public void CodigosPrefijo(Nodo _Raiz, ref Dictionary<byte, Nodo> _Tabla)
+            {
+                if (_Raiz.nodoI != null)
+                {
+                    _Raiz.nodoI.codigoPrefijo += _Raiz.codigoPrefijo + "0";
+                    if (_Tabla.ContainsKey(_Raiz.nodoI.llaveExtra))
+                    {
+                        _Tabla[_Raiz.nodoI.llaveExtra] = _Raiz.nodoI;
+                    }
+                    CodigosPrefijo(_Raiz.nodoI, ref _Tabla);
+                }
+
+                //Contenedora.Insertar(Raiz.dato);
+                if (_Raiz.nodoD != null)
+                {
+                    _Raiz.nodoD.codigoPrefijo += _Raiz.codigoPrefijo + "1";
+                    if (_Tabla.ContainsKey(_Raiz.nodoD.llaveExtra))
+                    {
+                        _Tabla[_Raiz.nodoD.llaveExtra] = _Raiz.nodoD;
+                    }
+                    CodigosPrefijo(_Raiz.nodoD, ref _Tabla);
+                }
+
+
             }
         }
 
@@ -175,6 +276,22 @@ namespace Libreria_ED2
             {
                 nuevaCola.Insertar(item.Value);
             }
+
+            // Iniciando arbol huffman
+            ArbolHuffman arbol = new ArbolHuffman();
+
+            //Armando arbol
+            while (nuevaCola.Cabeza != null)
+            {
+                Nodo menor = nuevaCola.Sacar();
+                Nodo mayor = nuevaCola.Sacar();
+                arbol.Insertar(menor, mayor, ref nuevaCola);
+
+            }
+
+            // Asignando codigos prefijo
+            arbol.CodigosPrefijo(arbol.Raiz, ref Tabla);
+
         }
     }
 }
