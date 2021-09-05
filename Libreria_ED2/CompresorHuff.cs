@@ -16,6 +16,7 @@ namespace Libreria_ED2
             tamanioBuffer = _tamanioBuffer;
             bufferBytes = new byte[tamanioBuffer];
         }
+
         private class Nodo
         {
             public byte llaveExtra;
@@ -37,6 +38,92 @@ namespace Libreria_ED2
             public int CompareTo(object obj)
             {
                 throw new NotImplementedException();
+            }
+        }
+
+        private class ColaPrioridad
+        {
+            public Nodo Cabeza = null;
+
+            // push
+            public void Insertar(Nodo insertar)
+            {
+                Nodo nuevoNodo = insertar;
+                if (Cabeza == null)
+                {
+                    Cabeza = nuevoNodo;
+                }
+                else
+                {
+
+                    //En el inicio de la cola
+                    if (nuevoNodo.frecuenciaRelativa < Cabeza.frecuenciaRelativa)
+                    {
+                        nuevoNodo.siguiente = Cabeza;
+                        Cabeza = nuevoNodo;
+                    }
+                    else
+                    {
+                        bool insertado = false;
+                        Nodo actual = Cabeza;
+                        Nodo siguiente = Cabeza.siguiente;
+                        while (insertado == false && siguiente != null)
+                        {
+                            if (nuevoNodo.frecuenciaRelativa < siguiente.frecuenciaRelativa)
+                            {
+                                actual.siguiente = nuevoNodo;
+                                nuevoNodo.siguiente = siguiente;
+                                insertado = true;
+                            }
+                            if (actual.frecuenciaRelativa == nuevoNodo.frecuenciaRelativa)
+                            {
+
+                                while (actual.frecuenciaRelativa == siguiente.frecuenciaRelativa)
+                                {
+                                    actual = actual.siguiente;
+                                    siguiente = siguiente.siguiente;
+                                }
+                                actual.siguiente = nuevoNodo;
+                                nuevoNodo.siguiente = siguiente;
+                                insertado = true;
+                            }
+
+                            actual = actual.siguiente;
+                            siguiente = siguiente.siguiente;
+                        }
+                        if (insertado == false && siguiente == null)
+                        {
+                            actual.siguiente = nuevoNodo;
+                        }
+                    }
+                    //En el medio de la cola
+
+
+                }
+            }
+           
+            //Pop
+            public Nodo Sacar()
+            {
+                Nodo pop = Cabeza;
+                if (Cabeza != null)
+                {
+                    Cabeza = Cabeza.siguiente;
+                }
+
+                return pop;
+            }
+            // Imprimir en consola el estado de la cola
+            public void MostrarCola()
+            {
+                Nodo Mostrar = Cabeza;
+
+                while (Mostrar != null)
+                {
+                    //.Write(Mostrar.caracter + ":");
+                    Console.WriteLine(Mostrar.frecuenciaRelativa);
+                    Mostrar = Mostrar.siguiente;
+                }
             }
         }
 
@@ -69,13 +156,6 @@ namespace Libreria_ED2
             } while (cantidadLeida == tamanioBuffer);
             br.Close();
 
-            
-
-            foreach (var item in Tabla.Values)
-            {
-                Console.WriteLine(item.caracter.ToString() +" " + item.frecuencia);
-            }
-
             //Calculando la suma de frecuencias
             decimal totalFrecuencias = 0;
             foreach (var item in Tabla)
@@ -87,7 +167,14 @@ namespace Libreria_ED2
             {
                 item.Value.frecuenciaRelativa = decimal.Divide(item.Value.frecuencia, totalFrecuencias);
             }
-            Console.WriteLine(totalFrecuencias);
+
+            //Llenando cola de prioridad primera vez
+            ColaPrioridad nuevaCola = new ColaPrioridad();
+
+            foreach (var item in Tabla)
+            {
+                nuevaCola.Insertar(item.Value);
+            }
         }
     }
 }
