@@ -75,6 +75,19 @@ namespace Libreria_ED2
             {
                 Console.WriteLine(item.caracter.ToString() +" " + item.frecuencia);
             }
+
+            //Calculando la suma de frecuencias
+            decimal totalFrecuencias = 0;
+            foreach (var item in Tabla)
+            {
+                totalFrecuencias += item.Value.frecuencia;
+            }
+            //Calculando frecuencias relativas para todos los bytes
+            foreach (var item in Tabla)
+            {
+                item.Value.frecuenciaRelativa = decimal.Divide(item.Value.frecuencia, totalFrecuencias);
+            }
+            Console.WriteLine(totalFrecuencias);
         }
     }
 }
