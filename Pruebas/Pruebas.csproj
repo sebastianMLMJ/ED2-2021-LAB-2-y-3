@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\LAB-01-ArbolB\ED2-2021-LAB-01\Libreria_ED2\Libreria_ED2.csproj" />
+  </ItemGroup>
+
+</Project>
