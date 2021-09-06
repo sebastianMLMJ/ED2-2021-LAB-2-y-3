@@ -292,6 +292,77 @@ namespace Libreria_ED2
             // Asignando codigos prefijo
             arbol.CodigosPrefijo(arbol.Raiz, ref Tabla);
 
+            int CantParejas = Tabla.Count;
+
+            BinaryWriter bwEncabezado = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            int cantidadParejas = Tabla.Count;
+            bwEncabezado.Write(CantParejas);
+            foreach (var item in Tabla)
+            {
+                bwEncabezado.Write(item.Key);
+                bwEncabezado.Write(item.Value.frecuencia);
+            }
+
+            //Compresion
+            string cadenaPrefijos = "";
+            StringBuilder sb = new StringBuilder(cadenaPrefijos);
+            long posicionLectura = 0; //CAMBIO
+            long posicionEscritura = bwEncabezado.BaseStream.Position;
+            int numbytes;
+            int residuoCadena;
+            byte[] bufferBytesCompresion;
+            string prefijoCompleto = "";
+            bwEncabezado.Close();
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            bw.Close();
+
+            do
+            {
+                //leyendo bloques de bytes
+                br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+                br.BaseStream.Position = posicionLectura;
+                cantidadLeida = br.Read(bufferBytes);
+                posicionLectura = br.BaseStream.Position;
+                br.Close();
+
+                //concatenando codigos
+
+                for (int i = 0; i < cantidadLeida; i++)
+                {
+                    sb.Append(Tabla[bufferBytes[i]].codigoPrefijo);
+                    if (sb.Length > tamanioBuffer)
+                    {
+                        numbytes = sb.Length / 8;
+                        residuoCadena = sb.Length % 8;
+                        bufferBytesCompresion = new byte[numbytes];
+
+                        for (int j = 0; j < numbytes; j++)
+                        {
+                            bufferBytesCompresion[j] = Convert.ToByte(sb.ToString().Substring(8 * j, 8), 2);
+                        }
+                        bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+                        bw.BaseStream.Position = posicionEscritura;
+                        bw.Write(bufferBytesCompresion);
+                        posicionEscritura = bw.BaseStream.Position;
+                        bw.Close();
+
+                        if (residuoCadena != 0)
+                        {
+                            string temp = sb.ToString().Substring(numbytes * 8, residuoCadena);
+                            sb.Clear();
+                            sb.Append(temp);
+
+                        }
+                        else
+                        {
+                            sb.Clear();
+                        }
+
+                    }
+
+                }
+
+            } while (cantidadLeida == tamanioBuffer);
         }
     }
 }
