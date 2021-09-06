@@ -363,6 +363,39 @@ namespace Libreria_ED2
                 }
 
             } while (cantidadLeida == tamanioBuffer);
+
+            bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            numbytes = sb.Length / 8;
+            residuoCadena = sb.Length % 8;
+            bufferBytesCompresion = new byte[numbytes];
+
+            for (int j = 0; j < numbytes; j++)
+            {
+                bufferBytesCompresion[j] = Convert.ToByte(sb.ToString().Substring(8 * j, 8), 2);
+            }
+
+            bw.BaseStream.Position = posicionEscritura;
+            bw.Write(bufferBytesCompresion);
+            posicionEscritura = bw.BaseStream.Position;
+
+
+            if (residuoCadena != 0)
+            {
+
+                string temp = sb.ToString().Substring(numbytes * 8, residuoCadena);
+                int cantidadCeros = 8 - residuoCadena;
+                for (int i = 0; i < cantidadCeros; i++)
+                {
+                    temp = temp + "0";
+                }
+
+                bw.Write(Convert.ToByte(temp, 2));
+            }
+            else
+            {
+                sb.Clear();
+            }
+            bw.Close();
         }
     }
 }
