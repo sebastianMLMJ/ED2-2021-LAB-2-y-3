@@ -397,5 +397,82 @@ namespace Libreria_ED2
             }
             bw.Close();
         }
+
+
+        public void Descomprimir(string dirLectura, string dirEscritura)
+        {
+            BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+            Dictionary<byte, Nodo> Tabla = new Dictionary<byte, Nodo>();
+            byte llave;
+            int parejas = br.ReadInt32();
+            long posicionsLectura;
+
+
+            //Descompresor 
+            do
+            {
+                br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+                br.BaseStream.Position = posicionsLectura;
+                cantidadLeida = br.Read(bufferBytes);
+                posicionsLectura = br.BaseStream.Position;
+                br.Close();
+
+                for (int i = 0; i < cantidadLeida; i++)
+                {
+                    string formateador = Convert.ToString(bufferBytes[i], 2).PadLeft(8, '0');
+                    sb.Append(formateador);
+
+
+                }
+
+            } while (cantidadLeida == tamanioBuffer);
+
+            string cadenaBuffer = sb.ToString();
+            int posicionSubstring = 0;
+            int longitudSubstring = 1;
+
+            while ((cadenaBuffer.Length - posicionSubstring - longitudSubstring) != 0)
+            {
+                string subCadenaBuffer = cadenaBuffer.Substring(posicionSubstring, longitudSubstring);
+
+                if (TablaBusqueda.ContainsKey(subCadenaBuffer))
+                {
+                    bytesDescomprimidos.Add(TablaBusqueda[subCadenaBuffer]);
+                    posicionSubstring += longitudSubstring;//CAMBIO IMPORTANTE
+                    longitudSubstring = 1;
+                }
+                else
+                {
+                    longitudSubstring += 1;
+                    if ((cadenaBuffer.Length - posicionSubstring - longitudSubstring) == 0)
+                    {
+                        subCadenaBuffer = cadenaBuffer.Substring(posicionSubstring, longitudSubstring);
+                        if (TablaBusqueda.ContainsKey(subCadenaBuffer))
+                        {
+                            bytesDescomprimidos.Add(TablaBusqueda[subCadenaBuffer]);
+                        }
+                    }
+
+                }
+            }
+
+            byte[] bufferBytesDescomprimidos = new byte[bytesDescomprimidos.Count];
+            int iterador = 0;
+            foreach (var item in bytesDescomprimidos)
+            {
+                bufferBytesDescomprimidos[iterador] = item;
+                iterador++;
+            }
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+
+            bw.Write(bufferBytesDescomprimidos);
+            bw.Close();
+
+
+
+
+
+
+        }
     }
 }
