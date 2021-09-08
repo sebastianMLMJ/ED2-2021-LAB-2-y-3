@@ -611,5 +611,60 @@ namespace Libreria_ED2
 
 
             }
+            while (cantidadLeida == tamanioBuffer);
+
+            string cadenaBuffer1 = sb.ToString();
+            int posicionSubstring1 = 0;
+            int longitudSubstring1 = 1;
+
+            while ((cadenaBuffer1.Length - posicionSubstring1 - longitudSubstring1) != 0)
+            {
+
+                string subCadenaBuffer = cadenaBuffer1.Substring(posicionSubstring1, longitudSubstring1);
+
+
+                if (TablaBusqueda.ContainsKey(subCadenaBuffer) && totalDescompresiones < totalFrecuencias)
+                {
+                    bytesDescomprimidos.Add(TablaBusqueda[subCadenaBuffer]);
+                    posicionSubstring1 += longitudSubstring1;
+                    longitudSubstring1 = 1;
+                    totalDescompresiones++;
+
+                }
+                else
+                {
+
+                    longitudSubstring1 += 1;
+
+                    if ((cadenaBuffer1.Length - posicionSubstring1 - longitudSubstring1) == 0)
+                    {
+                        subCadenaBuffer = cadenaBuffer1.Substring(posicionSubstring1, longitudSubstring1);
+                        if (TablaBusqueda.ContainsKey(subCadenaBuffer) && totalDescompresiones < totalFrecuencias)
+                        {
+                            bytesDescomprimidos.Add(TablaBusqueda[subCadenaBuffer]);
+                            totalDescompresiones++;
+                        }
+                    }
+
+                }
+
+
+            }
+
+            byte[] bufferBytesDescomprimidos1 = new byte[bytesDescomprimidos.Count];
+            int iteradorForEach1 = 0;
+            foreach (var item in bytesDescomprimidos)
+            {
+                bufferBytesDescomprimidos1[iteradorForEach1] = item;
+                iteradorForEach1++;
+            }
+            BinaryWriter bw1 = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            bw1.BaseStream.Position = posicionEscritura;
+            bw1.Write(bufferBytesDescomprimidos1);
+            posicionEscritura = bw1.BaseStream.Position;
+            bw1.Close();
+            bytesDescomprimidos.Clear();
+
         }
+    }
 }
