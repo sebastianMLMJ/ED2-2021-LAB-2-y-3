@@ -228,7 +228,7 @@ namespace Libreria_ED2
             }
         }
 
-        public void Comprimir(string dirLectura, string dirEscritura)
+        public void Comprimir(string dirLectura, string dirEscritura, string nombreCompresion)
         {
             //Llenando la tabla inicial con los bytes del archivo a comprimir
             BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.Open));
@@ -294,8 +294,10 @@ namespace Libreria_ED2
 
             int CantParejas = Tabla.Count;
 
-            BinaryWriter bwEncabezado = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            BinaryWriter bwEncabezado = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".huff", FileMode.OpenOrCreate));
             int cantidadParejas = Tabla.Count;
+            string nombreOriginal = Path.GetFileName(dirLectura);
+            bwEncabezado.Write(nombreOriginal);
             bwEncabezado.Write(CantParejas);
             foreach (var item in Tabla)
             {
@@ -313,7 +315,7 @@ namespace Libreria_ED2
             byte[] bufferBytesCompresion;
             string prefijoCompleto = "";
             bwEncabezado.Close();
-            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura + nombreCompresion +".huff", FileMode.OpenOrCreate));
             bw.Close();
 
             do
@@ -340,7 +342,7 @@ namespace Libreria_ED2
                         {
                             bufferBytesCompresion[j] = Convert.ToByte(sb.ToString().Substring(8 * j, 8), 2);
                         }
-                        bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+                        bw = new BinaryWriter(new FileStream(dirEscritura + nombreCompresion +".huff", FileMode.OpenOrCreate));
                         bw.BaseStream.Position = posicionEscritura;
                         bw.Write(bufferBytesCompresion);
                         posicionEscritura = bw.BaseStream.Position;
@@ -364,7 +366,7 @@ namespace Libreria_ED2
 
             } while (cantidadLeida == tamanioBuffer);
 
-            bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".huff", FileMode.OpenOrCreate));
             numbytes = sb.Length / 8;
             residuoCadena = sb.Length % 8;
             bufferBytesCompresion = new byte[numbytes];
@@ -404,6 +406,7 @@ namespace Libreria_ED2
             BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
             Dictionary<byte, Nodo> Tabla = new Dictionary<byte, Nodo>();
             byte llave;
+            string nombreOriginal = br.ReadString();
             int parejas = br.ReadInt32();
             long posicionsLectura;
 
@@ -592,7 +595,7 @@ namespace Libreria_ED2
                                     bufferBytesDescomprimidos[iteradorForEach] = item;
                                     iteradorForEach++;
                                 }
-                                BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+                                BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura+nombreOriginal, FileMode.OpenOrCreate));
                                 bw.BaseStream.Position = posicionEscritura;
                                 bw.Write(bufferBytesDescomprimidos);
                                 posicionEscritura = bw.BaseStream.Position;
@@ -658,7 +661,7 @@ namespace Libreria_ED2
                 bufferBytesDescomprimidos1[iteradorForEach1] = item;
                 iteradorForEach1++;
             }
-            BinaryWriter bw1 = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            BinaryWriter bw1 = new BinaryWriter(new FileStream(dirEscritura+nombreOriginal, FileMode.OpenOrCreate));
             bw1.BaseStream.Position = posicionEscritura;
             bw1.Write(bufferBytesDescomprimidos1);
             posicionEscritura = bw1.BaseStream.Position;

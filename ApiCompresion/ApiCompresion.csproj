@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\Archivos\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Libreria_ED2\Libreria_ED2.csproj" />
+  </ItemGroup>
+
+
+</Project>

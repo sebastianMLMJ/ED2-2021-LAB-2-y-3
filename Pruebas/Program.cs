@@ -7,8 +7,9 @@ namespace Pruebas
     {
         static void Main(string[] args)
         {
-            CompresorHuff tester = new CompresorHuff(1);
-            tester.Comprimir("c:\\ABF\\tarea.txt", "c:\\ABF\\CompresionTarea.huf");
+            CompresorHuff tester = new CompresorHuff(1024);
+            tester.Comprimir("c:\\ABF\\tarea.txt", "c:\\ABF\\","tareaCompresion");
+            tester.Descomprimir("c:\\ABF\\tareaCompresion.huff", "c:\\ABF\\Descompresiones\\");
         }
     }
 }

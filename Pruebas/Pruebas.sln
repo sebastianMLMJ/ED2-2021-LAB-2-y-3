@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pruebas", "Pruebas.csproj",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Libreria_ED2", "..\Libreria_ED2\Libreria_ED2.csproj", "{18FB1D49-2702-4352-A934-FA26ADE790C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiCompresion", "..\ApiCompresion\ApiCompresion.csproj", "{C014968E-6B6C-4F2E-8354-92ACE9602A98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{18FB1D49-2702-4352-A934-FA26ADE790C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18FB1D49-2702-4352-A934-FA26ADE790C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18FB1D49-2702-4352-A934-FA26ADE790C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C014968E-6B6C-4F2E-8354-92ACE9602A98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C014968E-6B6C-4F2E-8354-92ACE9602A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C014968E-6B6C-4F2E-8354-92ACE9602A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C014968E-6B6C-4F2E-8354-92ACE9602A98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
