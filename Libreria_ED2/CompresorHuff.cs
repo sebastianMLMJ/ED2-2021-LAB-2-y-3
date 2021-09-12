@@ -294,7 +294,7 @@ namespace Libreria_ED2
 
             int CantParejas = Tabla.Count;
 
-            BinaryWriter bwEncabezado = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".huff", FileMode.OpenOrCreate));
+            BinaryWriter bwEncabezado = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".huff", FileMode.Create));
             int cantidadParejas = Tabla.Count;
             string nombreOriginal = Path.GetFileName(dirLectura);
             bwEncabezado.Write(nombreOriginal);
@@ -302,7 +302,7 @@ namespace Libreria_ED2
             foreach (var item in Tabla)
             {
                 bwEncabezado.Write(item.Key);
-                bwEncabezado.Write(Convert.ToInt16(item.Value.frecuencia));
+                bwEncabezado.Write(Convert.ToInt32(item.Value.frecuencia));
             }
 
             //Compresion
@@ -400,7 +400,7 @@ namespace Libreria_ED2
             bw.Close();
 
             FileInfo archivoOriginalinf = new FileInfo(dirLectura);
-            FileInfo archivoComprimidoinf = new FileInfo(dirEscritura+nombreCompresion+".huff");
+            FileInfo archivoComprimidoinf = new FileInfo(dirEscritura + nombreCompresion + ".huff");
             long longitudOriginal = archivoOriginalinf.Length;
             long longitudComprimido = archivoComprimidoinf.Length;
             decimal razonCompresion = decimal.Divide(longitudComprimido, longitudOriginal);
@@ -411,7 +411,6 @@ namespace Libreria_ED2
             sw.BaseStream.Position = sw.BaseStream.Length;
             sw.WriteLine(registro);
             sw.Close();
-        
         }
 
         public string Descomprimir(string dirLectura, string dirEscritura)
@@ -428,7 +427,7 @@ namespace Libreria_ED2
                 Nodo nuevaEntrada = new Nodo();
                 llave = br.ReadByte();
                 nuevaEntrada.llaveExtra = llave;
-                nuevaEntrada.frecuencia = br.ReadInt16();
+                nuevaEntrada.frecuencia = br.ReadInt32();
                 nuevaEntrada.caracter = Convert.ToChar(llave); // SOLO PARA TEXTO
                 Tabla.Add(llave, nuevaEntrada);
             }
@@ -469,7 +468,6 @@ namespace Libreria_ED2
 
             arbol.CodigosPrefijo(arbol.Raiz, ref Tabla);
 
-            int VALORES = Tabla.Count;
             Dictionary<string, byte> TablaBusqueda = new Dictionary<string, byte>();
 
             foreach (var item in Tabla)
@@ -481,70 +479,8 @@ namespace Libreria_ED2
             StringBuilder sb = new StringBuilder(cadenaBinarios);
             List<byte> bytesDescomprimidos = new List<byte>();
             long posicionEscritura = 0;
-
-            //Descompresor Sencillo
-            //do
-            //{
-            //    br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
-            //    br.BaseStream.Position = posicionsLectura;
-            //    cantidadLeida = br.Read(bufferBytes);
-            //    posicionsLectura = br.BaseStream.Position;
-            //    br.Close();
-
-            //    for (int i = 0; i < cantidadLeida; i++)
-            //    {
-            //        string formateador = Convert.ToString(bufferBytes[i], 2).PadLeft(8,'0');
-            //        sb.Append(formateador);
-
-
-            //    }
-
-            //} while (cantidadLeida==tamanioBuffer);
-
-            //string cadenaBuffer = sb.ToString();
-            //int posicionSubstring = 0;
-            //int longitudSubstring = 1;
-
-            //while ((cadenaBuffer.Length - posicionSubstring - longitudSubstring) != 0 )
-            //{
-            //    string subCadenaBuffer = cadenaBuffer.Substring(posicionSubstring, longitudSubstring);
-
-            //    if (TablaBusqueda.ContainsKey(subCadenaBuffer))
-            //    {
-            //        bytesDescomprimidos.Add(TablaBusqueda[subCadenaBuffer]);
-            //        posicionSubstring += longitudSubstring ;//CAMBIO IMPORTANTE
-            //        longitudSubstring = 1;
-            //    }
-            //    else 
-            //    {
-            //        longitudSubstring += 1;
-            //        if ((cadenaBuffer.Length - posicionSubstring - longitudSubstring) == 0)
-            //        {
-            //            subCadenaBuffer = cadenaBuffer.Substring(posicionSubstring, longitudSubstring);
-            //            if (TablaBusqueda.ContainsKey(subCadenaBuffer))
-            //            {
-            //                bytesDescomprimidos.Add(TablaBusqueda[subCadenaBuffer]);
-            //            }
-            //        }
-
-            //    }
-            //}
-
-            //byte[] bufferBytesDescomprimidos = new byte[bytesDescomprimidos.Count];
-            //int iterador = 0;
-            //foreach (var item in bytesDescomprimidos)
-            //{
-            //    bufferBytesDescomprimidos[iterador] = item;
-            //    iterador++;
-            //}
-            //BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
-
-            //bw.Write(bufferBytesDescomprimidos);
-            //bw.Close();
-
-
-            //Descompresor pesado
-
+            BinaryWriter limpiador = new BinaryWriter(new FileStream(dirEscritura + nombreOriginal, FileMode.Create));
+            limpiador.Close();
             long totalDescompresiones = 0;
             do
             {
@@ -559,9 +495,6 @@ namespace Libreria_ED2
 
                     string formateador = Convert.ToString(bufferBytes[i], 2).PadLeft(8, '0');
                     sb.Append(formateador);
-
-
-
 
                     if (sb.Length >= tamanioBuffer)
                     {

@@ -87,5 +87,13 @@ namespace ApiCompresion.Controllers
                 return StatusCode(500);
             }
         }
+        [HttpGet]
+        [Route("compressions")]
+        public List<CompresorHuff.bitacoraCompresiones> Compresions()
+        {
+            CompresorHuff compress = new CompresorHuff(1024);
+            List<CompresorHuff.bitacoraCompresiones> devolverCompresiones = compress.Bitacora(rutasDeSubida.WebRootPath + "\\Archivos\\"+"Compresiones.txt");
+            return devolverCompresiones;
+        }
     }
 }
