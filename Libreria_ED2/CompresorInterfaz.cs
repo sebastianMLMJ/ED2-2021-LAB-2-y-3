@@ -11,9 +11,10 @@ namespace Libreria_ED2
 
         }
 
-        public void Descomprimir(string dirLectura, string dirEscritura)
+        public string Descomprimir(string dirLectura, string dirEscritura)
         {
-
+            string valor = "";
+            return valor;
         }
 
     }

@@ -401,7 +401,7 @@ namespace Libreria_ED2
         }
 
 
-        public void Descomprimir(string dirLectura, string dirEscritura)
+        public string Descomprimir(string dirLectura, string dirEscritura)
         {
             BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
             Dictionary<byte, Nodo> Tabla = new Dictionary<byte, Nodo>();
@@ -667,6 +667,8 @@ namespace Libreria_ED2
             posicionEscritura = bw1.BaseStream.Position;
             bw1.Close();
             bytesDescomprimidos.Clear();
+
+            return nombreOriginal;
 
         }
     }

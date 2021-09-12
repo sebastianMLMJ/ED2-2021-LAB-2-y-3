@@ -9,6 +9,7 @@ using System.IO;
 using Libreria_ED2;
 using System.Net;
 using System.Net.Http;
+using ApiCompresion.Models;
 
 namespace ApiCompresion.Controllers
 {
@@ -21,18 +22,6 @@ namespace ApiCompresion.Controllers
         public CompresorController(IWebHostEnvironment _rutas)
         {
             rutasDeSubida = _rutas;
-        }
-
-        public class SubirArchivo
-        {
-            public IFormFile File { get; set; }
-        }
-
-        [HttpGet]
-        [Route("compress")]
-        public string get()
-        {
-            return "direccion correcta";
         }
 
         [HttpPost]
@@ -66,7 +55,5 @@ namespace ApiCompresion.Controllers
                 return StatusCode(500);
             }
         }
-
-
     }
 }
