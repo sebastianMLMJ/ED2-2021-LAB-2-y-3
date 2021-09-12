@@ -24,7 +24,7 @@ namespace Libreria_ED2
             public int frecuencia;
             public decimal frecuenciaRelativa;
             public string codigoPrefijo;
-
+            
             public Nodo siguiente = null;
             public Nodo nodoI = null;
             public Nodo nodoD = null;
@@ -302,7 +302,7 @@ namespace Libreria_ED2
             foreach (var item in Tabla)
             {
                 bwEncabezado.Write(item.Key);
-                bwEncabezado.Write(item.Value.frecuencia);
+                bwEncabezado.Write(Convert.ToInt16(item.Value.frecuencia));
             }
 
             //Compresion
@@ -398,8 +398,21 @@ namespace Libreria_ED2
                 sb.Clear();
             }
             bw.Close();
-        }
 
+            FileInfo archivoOriginalinf = new FileInfo(dirLectura);
+            FileInfo archivoComprimidoinf = new FileInfo(dirEscritura+nombreCompresion+".huff");
+            long longitudOriginal = archivoOriginalinf.Length;
+            long longitudComprimido = archivoComprimidoinf.Length;
+            decimal razonCompresion = decimal.Divide(longitudComprimido, longitudOriginal);
+            decimal factorCompresion = decimal.Divide(longitudOriginal, longitudComprimido);
+            double reduccion = (1 - Convert.ToDouble(razonCompresion)) * 100;
+            StreamWriter sw = new StreamWriter(new FileStream(dirEscritura + "Compresiones.txt", FileMode.OpenOrCreate));
+            string registro = nombreOriginal + "," + dirEscritura + nombreCompresion + "," + razonCompresion.ToString() + "," + factorCompresion.ToString() + "," + reduccion.ToString();
+            sw.BaseStream.Position = sw.BaseStream.Length;
+            sw.WriteLine(registro);
+            sw.Close();
+        
+        }
 
         public string Descomprimir(string dirLectura, string dirEscritura)
         {
@@ -415,7 +428,7 @@ namespace Libreria_ED2
                 Nodo nuevaEntrada = new Nodo();
                 llave = br.ReadByte();
                 nuevaEntrada.llaveExtra = llave;
-                nuevaEntrada.frecuencia = br.ReadInt32();
+                nuevaEntrada.frecuencia = br.ReadInt16();
                 nuevaEntrada.caracter = Convert.ToChar(llave); // SOLO PARA TEXTO
                 Tabla.Add(llave, nuevaEntrada);
             }
@@ -671,5 +684,42 @@ namespace Libreria_ED2
             return nombreOriginal;
 
         }
+
+        public class bitacoraCompresiones
+        {
+            public string nombreArchivoOriginal { get; set; }
+            public string nombreRutaComprimido { get; set; }
+            public decimal razonCompresion { get; set; }
+            public decimal factorCompresion { get; set; }
+            public double porcentajeReduccion { get; set; }
+            
+        }
+
+        public List<bitacoraCompresiones> Bitacora(string dirLectura)
+        {
+
+            List<bitacoraCompresiones> listaCompresiones = new List<bitacoraCompresiones>();
+            StreamReader sr = new StreamReader(dirLectura);
+            string cadena = "l";
+            while (cadena!=null)
+            {
+                
+                bitacoraCompresiones nuevo = new bitacoraCompresiones();
+                cadena = sr.ReadLine();
+                if (cadena!= null)
+                {
+                    string[] split = cadena.Split(',');
+                    nuevo.nombreArchivoOriginal = split[0];
+                    nuevo.nombreRutaComprimido = split[1];
+                    nuevo.razonCompresion = Convert.ToDecimal(split[2]);
+                    nuevo.factorCompresion = Convert.ToDecimal(split[3]);
+                    nuevo.porcentajeReduccion = Convert.ToDouble(split[4]);
+                    listaCompresiones.Add(nuevo);
+                }
+            }
+            return listaCompresiones;
+
+        }
+
     }
 }
