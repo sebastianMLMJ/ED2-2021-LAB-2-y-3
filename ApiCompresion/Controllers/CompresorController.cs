@@ -30,6 +30,7 @@ namespace ApiCompresion.Controllers
         {
             if (objetoArchivo.File.Length > 0)
             {
+                
                 if (!Directory.Exists(rutasDeSubida.WebRootPath + "\\Archivos\\"))
                 {
                     Directory.CreateDirectory(rutasDeSubida.WebRootPath + "\\Archivos\\");

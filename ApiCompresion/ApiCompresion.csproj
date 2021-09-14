@@ -5,12 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
-    <Folder Include="wwwroot\Archivos\" />
+    <ProjectReference Include="..\Libreria_ED2\Libreria_ED2.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Libreria_ED2\Libreria_ED2.csproj" />
+    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\Archivos\" />
   </ItemGroup>
 
 
