@@ -8,14 +8,15 @@ namespace Libreria_ED2
     public class CompresorLZW:CompresorInterfaz
     {
         int longitudBuffer;
-        
+        string cadenaInicial = "";
+        string cadenaFinal = "";
         public CompresorLZW(int _longitudBuffer)
         {
             longitudBuffer = _longitudBuffer;
 
         }
 
-        public void Comprimir(string dirLectura, string dirEsctritura, string nombre)
+        public void Comprimir(string dirLectura, string dirEsctritura, string nombreCompresion)
         {
             BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
             br.Close();
@@ -89,6 +90,107 @@ namespace Libreria_ED2
                 {
                     listaIndices.Add(dicLetras[sbActual.ToString()]);
                 }
+            }
+
+
+            int numeroMasGrande = 0;
+            foreach (var item in listaIndices)
+            {
+                if (item > numeroMasGrande)
+                {
+                    numeroMasGrande = item;
+                }
+            }
+
+
+            string conversionBinario = Convert.ToString(numeroMasGrande, 2);
+            int standardBits = conversionBinario.Length;
+            int cantidadLetras = encabezado.Count;
+
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEsctritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+            string nombreOriginal = Path.GetFileName(dirLectura);
+            bw.Write(nombreOriginal);
+            bw.Write(standardBits);
+            bw.Write(cantidadLetras);
+            foreach (var item in encabezado)
+            {
+                bw.Write(item);
+            }
+            long posicionEscritura = bw.BaseStream.Position;
+            bw.Close();
+
+            StringBuilder cadenaBinaria = new StringBuilder();
+            string subCadenaCompresion = "";
+            int numBytes, residuo;
+            byte[] bufferBytesCompresion;
+            string residuoCadena;
+            string cadenaAlterna = "";
+
+            foreach (var item in listaIndices)
+            {
+                subCadenaCompresion = Convert.ToString(item, 2);
+                subCadenaCompresion = subCadenaCompresion.PadLeft(standardBits, '0');
+                cadenaBinaria.Append(subCadenaCompresion);
+                cadenaInicial += subCadenaCompresion;
+                if (cadenaBinaria.Length >= longitudBuffer)
+                {
+                    numBytes = cadenaBinaria.Length / 8;
+                    residuo = cadenaBinaria.Length % 8;
+                    bufferBytesCompresion = new byte[numBytes];
+
+                    for (int i = 0; i < numBytes; i++)
+                    {
+                        bufferBytesCompresion[i] = Convert.ToByte(cadenaBinaria.ToString().Substring(8 * i, 8), 2);
+                    }
+
+                    if (residuo != 0)
+                    {
+                        residuoCadena = cadenaBinaria.ToString().Substring(numBytes * 8, residuo);
+                        cadenaBinaria.Clear();
+                        cadenaBinaria.Append(residuoCadena);
+                    }
+                    else
+                    {
+                        cadenaBinaria.Clear();
+                    }
+
+
+                    bw = new BinaryWriter(new FileStream(dirEsctritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+                    bw.BaseStream.Position = posicionEscritura;
+                    bw.Write(bufferBytesCompresion);
+                    posicionEscritura = bw.BaseStream.Position;
+                    bw.Close();
+
+                }
+            }
+
+            Console.WriteLine(cadenaAlterna);
+
+            if (cadenaBinaria.Length != 0)
+            {
+                numBytes = cadenaBinaria.Length / 8;
+                residuo = cadenaBinaria.Length % 8;
+                bufferBytesCompresion = new byte[numBytes];
+
+                for (int i = 0; i < numBytes; i++)
+                {
+                    bufferBytesCompresion[i] = Convert.ToByte(cadenaBinaria.ToString().Substring(8 * i, 8), 2);
+                }
+
+                bw = new BinaryWriter(new FileStream(dirEsctritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+                bw.BaseStream.Position = posicionEscritura;
+                bw.Write(bufferBytesCompresion);
+                posicionEscritura = bw.BaseStream.Position;
+                if (residuo != 0)
+                {
+                    residuoCadena = cadenaBinaria.ToString().Substring(numBytes * 8, residuo);
+                    residuoCadena = residuoCadena.PadRight(8, '0');
+                    byte byteFinal = Convert.ToByte(residuoCadena, 2);
+                    cadenaBinaria.Clear();
+                    bw.Write(byteFinal);
+                }
+                bw.Close();
+
             }
         }
     }
