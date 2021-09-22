@@ -51,6 +51,45 @@ namespace Libreria_ED2
             } while (cantidadLeida == longitudBuffer);
             posicíonLectura = 0;
 
+            // LLenando el resto de cadenas en diccionario y la lista de índices
+            List<int> listaIndices = new List<int>();
+            StringBuilder sbActual = new StringBuilder();
+            StringBuilder sbAnterior = new StringBuilder();
+            do
+            {
+                br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+                br.BaseStream.Position = posicíonLectura;
+                cantidadLeida = br.Read(bufferBytesLectura);
+                posicíonLectura = br.BaseStream.Position;
+                br.Close();
+
+                for (int i = 0; i < cantidadLeida; i++)
+                {
+                    letra = Convert.ToChar(bufferBytesLectura[i]);
+                    sbAnterior.Clear();
+                    sbAnterior.Append(sbActual);
+                    sbActual.Append(letra);
+
+                    if (dicLetras.ContainsKey(sbActual.ToString()) == false)
+                    {
+                        dicLetras.Add(sbActual.ToString(), indice);
+                        listaIndices.Add(dicLetras[sbAnterior.ToString()]);
+                        indice++;
+                        sbActual.Clear();
+                        sbAnterior.Clear();
+                        sbActual.Append(letra);
+                    }
+                }
+            } while (cantidadLeida == longitudBuffer);
+
+
+            if (sbActual.Length != 0)
+            {
+                if (dicLetras.ContainsKey(sbActual.ToString()))
+                {
+                    listaIndices.Add(dicLetras[sbActual.ToString()]);
+                }
+            }
         }
     }
 }
