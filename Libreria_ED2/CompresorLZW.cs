@@ -16,7 +16,7 @@ namespace Libreria_ED2
 
         }
 
-        public void Comprimir(string dirLectura, string dirEsctritura, string nombreCompresion)
+        public void Comprimir(string dirLectura, string dirEscritura, string nombreCompresion)
         {
             BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
             br.Close();
@@ -107,7 +107,7 @@ namespace Libreria_ED2
             int standardBits = conversionBinario.Length;
             int cantidadLetras = encabezado.Count;
 
-            BinaryWriter bw = new BinaryWriter(new FileStream(dirEsctritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
             string nombreOriginal = Path.GetFileName(dirLectura);
             bw.Write(nombreOriginal);
             bw.Write(standardBits);
@@ -155,7 +155,7 @@ namespace Libreria_ED2
                     }
 
 
-                    bw = new BinaryWriter(new FileStream(dirEsctritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+                    bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
                     bw.BaseStream.Position = posicionEscritura;
                     bw.Write(bufferBytesCompresion);
                     posicionEscritura = bw.BaseStream.Position;
@@ -177,7 +177,7 @@ namespace Libreria_ED2
                     bufferBytesCompresion[i] = Convert.ToByte(cadenaBinaria.ToString().Substring(8 * i, 8), 2);
                 }
 
-                bw = new BinaryWriter(new FileStream(dirEsctritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+                bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
                 bw.BaseStream.Position = posicionEscritura;
                 bw.Write(bufferBytesCompresion);
                 posicionEscritura = bw.BaseStream.Position;
@@ -191,6 +191,18 @@ namespace Libreria_ED2
                 }
                 bw.Close();
 
+                FileInfo archivoOriginalinf = new FileInfo(dirLectura);
+                FileInfo archivoComprimidoinf = new FileInfo(dirEscritura + nombreCompresion + ".LZW");
+                long longitudOriginal = archivoOriginalinf.Length;
+                long longitudComprimido = archivoComprimidoinf.Length;
+                decimal razonCompresion = decimal.Divide(longitudComprimido, longitudOriginal);
+                decimal factorCompresion = decimal.Divide(longitudOriginal, longitudComprimido);
+                double reduccion = (1 - Convert.ToDouble(razonCompresion)) * 100;
+                StreamWriter sw = new StreamWriter(new FileStream(dirEscritura + "Compresiones.txt", FileMode.OpenOrCreate));
+                string registro = nombreOriginal + "," + dirEscritura + nombreCompresion + "," + razonCompresion.ToString() + "," + factorCompresion.ToString() + "," + reduccion.ToString();
+                sw.BaseStream.Position = sw.BaseStream.Length;
+                sw.WriteLine(registro);
+                sw.Close();
             }
         }
     }
