@@ -205,5 +205,109 @@ namespace Libreria_ED2
                 sw.Close();
             }
         }
+        public void Descomprimir(string dirLectura, string dirEscritura)
+        {
+            //Leyendo encabezado
+            BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+            Dictionary<int, string> dicLetras = new Dictionary<int, string>();
+            string nombreOrginal = br.ReadString();
+            int standarBits = br.ReadInt32();
+            int cantidadCaracteres = br.ReadInt32();
+            int contador = 1;
+            char letra;
+            long posicionEscritura = 0;
+
+            for (int i = 0; i < cantidadCaracteres; i++)
+            {
+                letra = Convert.ToChar(br.ReadByte());
+                dicLetras.Add(contador, letra.ToString());
+                contador++;
+            }
+            long posicionLectura = br.BaseStream.Position;
+            br.Close();
+
+            int cantidadLeida;
+            byte[] bufferBytesLectura = new byte[longitudBuffer];
+            StringBuilder cadenaBits = new StringBuilder();
+            string conversorBinario;
+            int numeroIndices;
+            int residuoIndices;
+            List<int> indices = new List<int>();
+            do
+            {
+                br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+                br.BaseStream.Position = posicionLectura;
+                cantidadLeida = br.Read(bufferBytesLectura);
+                posicionLectura = br.BaseStream.Position;
+                br.Close();
+
+                for (int i = 0; i < cantidadLeida; i++)
+                {
+                    conversorBinario = Convert.ToString(bufferBytesLectura[i], 2).PadLeft(8, '0');
+                    cadenaBits.Append(conversorBinario);
+                    cadenaFinal += conversorBinario;
+
+                    if (cadenaBits.Length >= longitudBuffer)
+                    {
+                        numeroIndices = cadenaBits.Length / standarBits;
+                        residuoIndices = cadenaBits.Length % standarBits;
+                        for (int j = 0; j < numeroIndices; j++)
+                        {
+                            indices.Add(Convert.ToInt32(cadenaBits.ToString().Substring(j * standarBits, standarBits), 2));
+
+                        }
+                        if (residuoIndices != 0)
+                        {
+                            string bitsResiduo = cadenaBits.ToString().Substring(numeroIndices * standarBits, residuoIndices);
+                            cadenaBits.Clear();
+                            cadenaBits.Append(bitsResiduo);
+
+                        }
+                        else
+                        {
+                            cadenaBits.Clear();
+                        }
+                    }
+                }
+
+            } while (cantidadLeida == longitudBuffer);
+
+            if (cadenaBits.Length != 0)
+            {
+                numeroIndices = cadenaBits.Length / standarBits;
+                residuoIndices = cadenaBits.Length % standarBits;
+                for (int j = 0; j < numeroIndices; j++)
+                {
+                    indices.Add(Convert.ToInt32(cadenaBits.ToString().Substring(j * standarBits, standarBits), 2));
+                }
+                cadenaBits.Clear();
+
+            }
+            if (indices.Contains(0))
+            {
+                indices.Remove(0);
+            }
+            int numLetras = dicLetras.Count;
+            int numIndices = indices.Count;
+
+            if (string.Compare(cadenaInicial, cadenaInicial) == 0)
+            {
+                Console.WriteLine("La compresion es correcta");
+            }
+
+            string cadenaAnterior = "";
+            string cadenaActual = "";
+            string cadenaAnteriorPrimerActual = "";
+            StringBuilder texto = new StringBuilder();
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+            bw.Close();
+            char[] charBytes;
+            byte[] bytesFinales;
+
+
+           
+
+       
+
     }
 }
