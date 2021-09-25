@@ -305,9 +305,60 @@ namespace Libreria_ED2
             byte[] bytesFinales;
 
 
-           
+            foreach (var item in indices)
+            {
+                cadenaAnterior = "";
+                cadenaAnterior = cadenaActual;
+                cadenaActual = dicLetras[item];
+                cadenaAnteriorPrimerActual = cadenaAnterior + cadenaActual.Substring(0, 1);
 
-       
+                if (dicLetras.ContainsValue(cadenaAnteriorPrimerActual) == false)
+                {
+                    dicLetras.Add(contador, cadenaAnteriorPrimerActual);
+                    contador++;
+                }
 
-    }
+                texto.Append(cadenaActual);
+
+                if (texto.Length > longitudBuffer)
+                {
+                    bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+                    bw.BaseStream.Position = posicionEscritura;
+                    charBytes = texto.ToString().ToCharArray();
+                    bytesFinales = new byte[charBytes.Length];
+                    for (int i = 0; i < charBytes.Length; i++)
+                    {
+                        bytesFinales[i] = Convert.ToByte(charBytes[i]);
+                    }
+                    bw.Write(bytesFinales);
+                    posicionEscritura = bw.BaseStream.Position;
+                    bw.Close();
+                    texto.Clear();
+                }
+
+
+
+
+            }
+            if (texto.Length != 0)
+            {
+                bw = new BinaryWriter(new FileStream(dirEscritura, FileMode.OpenOrCreate));
+                bw.BaseStream.Position = posicionEscritura;
+                charBytes = texto.ToString().ToCharArray();
+                bytesFinales = new byte[charBytes.Length];
+                for (int i = 0; i < charBytes.Length; i++)
+                {
+                    bytesFinales[i] = Convert.ToByte(charBytes[i]);
+                }
+                bw.Write(bytesFinales);
+                posicionEscritura = bw.BaseStream.Position;
+                bw.Close();
+                texto.Clear();
+
+
+
+
+
+
+            }
 }
