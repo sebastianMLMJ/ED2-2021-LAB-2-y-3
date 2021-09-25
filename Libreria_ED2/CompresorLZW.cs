@@ -361,4 +361,41 @@ namespace Libreria_ED2
 
 
             }
-}
+        }
+
+            public class bitacoraCompresiones
+        {
+            public string nombreArchivoOriginal { get; set; }
+            public string nombreRutaComprimido { get; set; }
+            public decimal razonCompresion { get; set; }
+            public decimal factorCompresion { get; set; }
+            public double porcentajeReduccion { get; set; }
+
+        }
+
+        public List<bitacoraCompresiones> Bitacora(string dirLectura)
+        {
+
+            List<bitacoraCompresiones> listaCompresiones = new List<bitacoraCompresiones>();
+            StreamReader sr = new StreamReader(dirLectura);
+            string cadena = "l";
+            while (cadena != null)
+            {
+
+                bitacoraCompresiones nuevo = new bitacoraCompresiones();
+                cadena = sr.ReadLine();
+                if (cadena != null)
+                {
+                    string[] split = cadena.Split(',');
+                    nuevo.nombreArchivoOriginal = split[0];
+                    nuevo.nombreRutaComprimido = split[1];
+                    nuevo.razonCompresion = Convert.ToDecimal(split[2]);
+                    nuevo.factorCompresion = Convert.ToDecimal(split[3]);
+                    nuevo.porcentajeReduccion = Convert.ToDouble(split[4]);
+                    listaCompresiones.Add(nuevo);
+                }
+            }
+            return listaCompresiones;
+
+        }
+    }
