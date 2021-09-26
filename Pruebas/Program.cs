@@ -9,8 +9,8 @@ namespace Pruebas
         {
             CompresorHuff tester = new CompresorHuff(1024);
             CompresorLZW testerLZW = new CompresorLZW(1024);
-            testerLZW.Comprimir("c:\\ABF\\Tarea.txt", "c:\\ABF\\","tareaCompresion");
-            //tester.Descomprimir("c:\\ABF\\tareaCompresion.huff", "c:\\ABF\\Descompresiones\\");
+            testerLZW.Comprimir("c:\\ABF\\evangelio_segun_marcos.txt", "c:\\ABF\\","tareaCompresion");
+            testerLZW.Descomprimir("c:\\ABF\\tareaCompresion.LZW", "c:\\ABF\\Descompresiones\\");
         }
     }
 }

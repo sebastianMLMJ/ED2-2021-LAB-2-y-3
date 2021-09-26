@@ -102,12 +102,11 @@ namespace Libreria_ED2
                 }
             }
 
-
             string conversionBinario = Convert.ToString(numeroMasGrande, 2);
             int standardBits = conversionBinario.Length;
             int cantidadLetras = encabezado.Count;
 
-            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.Create));
             string nombreOriginal = Path.GetFileName(dirLectura);
             bw.Write(nombreOriginal);
             bw.Write(standardBits);
@@ -204,6 +203,202 @@ namespace Libreria_ED2
                 sw.WriteLine(registro);
                 sw.Close();
             }
+
+        
+        }
+
+        public string Descomprimir(string dirLectura, string dirEscritura)
+        {
+            //Leyendo encabezado
+            BinaryReader br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+            Dictionary<int, string> dicLetras = new Dictionary<int, string>();
+            string nombreOrginal = br.ReadString();
+            int standarBits = br.ReadInt32();
+            int cantidadCaracteres = br.ReadInt32();
+            int contador = 1;
+            char letra;
+            long posicionEscritura = 0;
+
+            for (int i = 0; i < cantidadCaracteres; i++)
+            {
+                letra = Convert.ToChar(br.ReadByte());
+                dicLetras.Add(contador, letra.ToString());
+                contador++;
+            }
+            long posicionLectura = br.BaseStream.Position;
+            br.Close();
+
+            int cantidadLeida;
+            byte[] bufferBytesLectura = new byte[longitudBuffer];
+            StringBuilder cadenaBits = new StringBuilder();
+            string conversorBinario;
+            int numeroIndices;
+            int residuoIndices;
+            List<int> indices = new List<int>();
+            do
+            {
+                br = new BinaryReader(new FileStream(dirLectura, FileMode.OpenOrCreate));
+                br.BaseStream.Position = posicionLectura;
+                cantidadLeida = br.Read(bufferBytesLectura);
+                posicionLectura = br.BaseStream.Position;
+                br.Close();
+
+                for (int i = 0; i < cantidadLeida; i++)
+                {
+                    conversorBinario = Convert.ToString(bufferBytesLectura[i], 2).PadLeft(8, '0');
+                    cadenaBits.Append(conversorBinario);
+                    cadenaFinal += conversorBinario;
+
+                    if (cadenaBits.Length >= longitudBuffer)
+                    {
+                        numeroIndices = cadenaBits.Length / standarBits;
+                        residuoIndices = cadenaBits.Length % standarBits;
+                        for (int j = 0; j < numeroIndices; j++)
+                        {
+                            indices.Add(Convert.ToInt32(cadenaBits.ToString().Substring(j * standarBits, standarBits), 2));
+
+                        }
+                        if (residuoIndices != 0)
+                        {
+                            string bitsResiduo = cadenaBits.ToString().Substring(numeroIndices * standarBits, residuoIndices);
+                            cadenaBits.Clear();
+                            cadenaBits.Append(bitsResiduo);
+
+                        }
+                        else
+                        {
+                            cadenaBits.Clear();
+                        }
+                    }
+                }
+
+            } while (cantidadLeida == longitudBuffer);
+
+            if (cadenaBits.Length != 0)
+            {
+                numeroIndices = cadenaBits.Length / standarBits;
+                residuoIndices = cadenaBits.Length % standarBits;
+                for (int j = 0; j < numeroIndices; j++)
+                {
+                    indices.Add(Convert.ToInt32(cadenaBits.ToString().Substring(j * standarBits, standarBits), 2));
+                }
+                cadenaBits.Clear();
+
+            }
+            if (indices.Contains(0))
+            {
+                indices.Remove(0);
+            }
+
+            
+
+            string cadenaAnterior = "";
+            string cadenaActual = "";
+            string cadenaAnteriorPrimerActual = "";
+            StringBuilder texto = new StringBuilder();
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura + nombreOrginal, FileMode.Create));
+            bw.Close();
+            char[] charBytes;
+            byte[] bytesFinales;
+            
+            foreach (var item in indices)
+            {
+                cadenaAnterior = "";
+                cadenaAnterior = cadenaActual;
+
+                if (dicLetras.ContainsKey(item))
+                {
+                    cadenaActual = dicLetras[item];
+                    cadenaAnteriorPrimerActual = cadenaAnterior + cadenaActual.Substring(0, 1);
+                    if (dicLetras.ContainsValue(cadenaAnteriorPrimerActual) == false)
+                    {
+                        dicLetras.Add(contador, cadenaAnteriorPrimerActual);
+                        contador++;
+                    }
+                    texto.Append(cadenaActual);
+
+                }
+                else 
+                {
+                    cadenaActual = cadenaActual + cadenaAnterior.Substring(0, 1);
+                    dicLetras.Add(contador, cadenaActual);
+                    contador++;
+                    texto.Append(cadenaActual);
+                }
+                
+                if (texto.Length > longitudBuffer)
+                {
+                    bw = new BinaryWriter(new FileStream(dirEscritura + nombreOrginal, FileMode.OpenOrCreate));
+                    bw.BaseStream.Position = posicionEscritura;
+                    charBytes = texto.ToString().ToCharArray();
+                    bytesFinales = new byte[charBytes.Length];
+                    for (int i = 0; i < charBytes.Length; i++)
+                    {
+                        bytesFinales[i] = Convert.ToByte(charBytes[i]);
+                    }
+                    bw.Write(bytesFinales);
+                    posicionEscritura = bw.BaseStream.Position;
+                    bw.Close();
+                    texto.Clear();
+                }
+
+
+
+
+            }
+            if (texto.Length != 0)
+            {
+                bw = new BinaryWriter(new FileStream(dirEscritura + nombreOrginal, FileMode.OpenOrCreate));
+                bw.BaseStream.Position = posicionEscritura;
+                charBytes = texto.ToString().ToCharArray();
+                bytesFinales = new byte[charBytes.Length];
+                for (int i = 0; i < charBytes.Length; i++)
+                {
+                    bytesFinales[i] = Convert.ToByte(charBytes[i]);
+                }
+                bw.Write(bytesFinales);
+                posicionEscritura = bw.BaseStream.Position;
+                bw.Close();
+                texto.Clear();
+            }
+
+            return nombreOrginal;
+        }
+
+        public class bitacoraCompresiones
+        {
+            public string nombreArchivoOriginal { get; set; }
+            public string nombreRutaComprimido { get; set; }
+            public decimal razonCompresion { get; set; }
+            public decimal factorCompresion { get; set; }
+            public double porcentajeReduccion { get; set; }
+
+        }
+
+        public List<bitacoraCompresiones> Bitacora(string dirLectura)
+        {
+
+            List<bitacoraCompresiones> listaCompresiones = new List<bitacoraCompresiones>();
+            StreamReader sr = new StreamReader(dirLectura);
+            string cadena = "l";
+            while (cadena != null)
+            {
+
+                bitacoraCompresiones nuevo = new bitacoraCompresiones();
+                cadena = sr.ReadLine();
+                if (cadena != null)
+                {
+                    string[] split = cadena.Split(',');
+                    nuevo.nombreArchivoOriginal = split[0];
+                    nuevo.nombreRutaComprimido = split[1];
+                    nuevo.razonCompresion = Convert.ToDecimal(split[2]);
+                    nuevo.factorCompresion = Convert.ToDecimal(split[3]);
+                    nuevo.porcentajeReduccion = Convert.ToDouble(split[4]);
+                    listaCompresiones.Add(nuevo);
+                }
+            }
+            return listaCompresiones;
+
         }
     }
 }
