@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Libreria_ED2
 {
-    public class CompresorLZW:CompresorInterfaz
+    public class CompresorLZW : CompresorInterfaz
     {
         int longitudBuffer;
         string cadenaInicial = "";
@@ -106,7 +106,7 @@ namespace Libreria_ED2
             int standardBits = conversionBinario.Length;
             int cantidadLetras = encabezado.Count;
 
-            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.Create));
+            BinaryWriter bw = new BinaryWriter(new FileStream(dirEscritura + nombreCompresion + ".LZW", FileMode.Create));
             string nombreOriginal = Path.GetFileName(dirLectura);
             bw.Write(nombreOriginal);
             bw.Write(standardBits);
@@ -154,7 +154,7 @@ namespace Libreria_ED2
                     }
 
 
-                    bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+                    bw = new BinaryWriter(new FileStream(dirEscritura + nombreCompresion + ".LZW", FileMode.OpenOrCreate));
                     bw.BaseStream.Position = posicionEscritura;
                     bw.Write(bufferBytesCompresion);
                     posicionEscritura = bw.BaseStream.Position;
@@ -176,7 +176,7 @@ namespace Libreria_ED2
                     bufferBytesCompresion[i] = Convert.ToByte(cadenaBinaria.ToString().Substring(8 * i, 8), 2);
                 }
 
-                bw = new BinaryWriter(new FileStream(dirEscritura+nombreCompresion+".LZW", FileMode.OpenOrCreate));
+                bw = new BinaryWriter(new FileStream(dirEscritura + nombreCompresion + ".LZW", FileMode.OpenOrCreate));
                 bw.BaseStream.Position = posicionEscritura;
                 bw.Write(bufferBytesCompresion);
                 posicionEscritura = bw.BaseStream.Position;
@@ -204,7 +204,7 @@ namespace Libreria_ED2
                 sw.Close();
             }
 
-        
+
         }
 
         public string Descomprimir(string dirLectura, string dirEscritura)
@@ -290,7 +290,7 @@ namespace Libreria_ED2
                 indices.Remove(0);
             }
 
-            
+
 
             string cadenaAnterior = "";
             string cadenaActual = "";
@@ -300,7 +300,7 @@ namespace Libreria_ED2
             bw.Close();
             char[] charBytes;
             byte[] bytesFinales;
-            
+
             foreach (var item in indices)
             {
                 cadenaAnterior = "";
@@ -318,14 +318,14 @@ namespace Libreria_ED2
                     texto.Append(cadenaActual);
 
                 }
-                else 
+                else
                 {
                     cadenaActual = cadenaActual + cadenaAnterior.Substring(0, 1);
                     dicLetras.Add(contador, cadenaActual);
                     contador++;
                     texto.Append(cadenaActual);
                 }
-                
+
                 if (texto.Length > longitudBuffer)
                 {
                     bw = new BinaryWriter(new FileStream(dirEscritura + nombreOrginal, FileMode.OpenOrCreate));
@@ -374,6 +374,10 @@ namespace Libreria_ED2
             public double porcentajeReduccion { get; set; }
 
         }
+
+
+        
+
 
         public List<bitacoraCompresiones> Bitacora(string dirLectura)
         {
